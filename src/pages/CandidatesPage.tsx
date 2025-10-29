@@ -5,12 +5,14 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Mail, LayoutList, LayoutGrid } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import type { Candidate, CandidateStage } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { CandidateKanbanBoard } from '@/components/candidates/CandidateKanbanBoard';
 
 const STAGES: { value: CandidateStage | 'all'; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -25,6 +27,7 @@ const STAGES: { value: CandidateStage | 'all'; label: string }[] = [
 export default function CandidatesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeStage, setActiveStage] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   const { data: candidatesData, isLoading } = useQuery({
     queryKey: ['candidates', 'all'],
@@ -71,6 +74,22 @@ export default function CandidatesPage() {
             className="pl-10"
           />
         </div>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('list')}
+          >
+            <LayoutList className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'board' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('board')}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeStage} onValueChange={setActiveStage}>
@@ -83,7 +102,13 @@ export default function CandidatesPage() {
         </TabsList>
 
         <TabsContent value={activeStage} className="mt-6">
-          {isLoading ? (
+          {viewMode === 'board' ? (
+            isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <CandidateKanbanBoard candidates={filteredCandidates} />
+            )
+          ) : isLoading ? (
             <div className="space-y-3">
               {[...Array(10)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
