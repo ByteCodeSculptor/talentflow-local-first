@@ -9,6 +9,7 @@ import { ArrowLeft, Mail, Calendar, Briefcase } from 'lucide-react';
 import { format } from 'date-fns';
 import type { CandidateStage } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { NotesSection } from '@/components/candidates/NotesSection';
 
 const STAGES: CandidateStage[] = ['applied', 'screen', 'tech', 'offer', 'hired', 'rejected'];
 
@@ -203,6 +204,8 @@ export default function CandidateDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          <NotesSection candidateId={candidate.id} />
         </div>
       </div>
     </div>

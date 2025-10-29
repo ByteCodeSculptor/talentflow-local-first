@@ -15,6 +15,7 @@ export const handlers = [
     
     const url = new URL(request.url);
     const status = url.searchParams.get('status');
+    const tags = url.searchParams.get('tags');
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
     
@@ -22,6 +23,13 @@ export const handlers = [
     
     if (status) {
       jobs = jobs.filter(j => j.status === status);
+    }
+    
+    if (tags) {
+      const tagArray = tags.split(',').map(t => t.trim().toLowerCase());
+      jobs = jobs.filter(j => 
+        j.tags.some(tag => tagArray.includes(tag.toLowerCase()))
+      );
     }
     
     const start = (page - 1) * pageSize;
@@ -338,5 +346,48 @@ export const handlers = [
     
     await db.assessmentResponses.add(response);
     return HttpResponse.json({ data: response });
+  }),
+
+  // Notes endpoints
+  http.post('/api/notes', async ({ request }) => {
+    await simulateLatency();
+    
+    if (shouldSimulateError()) {
+      return HttpResponse.json(
+        { error: 'Failed to create note. Please try again.' },
+        { status: 500 }
+      );
+    }
+    
+    const body = await request.json() as any;
+    const note = {
+      ...body,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+    };
+    
+    await db.notes.add(note);
+    
+    // Add timeline event
+    await db.timeline.add({
+      id: crypto.randomUUID(),
+      candidateId: body.candidateId,
+      type: 'note',
+      content: body.content.substring(0, 100) + (body.content.length > 100 ? '...' : ''),
+      createdAt: new Date().toISOString(),
+    });
+    
+    return HttpResponse.json({ data: note });
+  }),
+
+  http.get('/api/notes/:candidateId', async ({ params }) => {
+    await simulateLatency();
+    const notes = await db.notes
+      .where('candidateId')
+      .equals(params.candidateId as string)
+      .reverse()
+      .sortBy('createdAt');
+    
+    return HttpResponse.json({ data: notes });
   }),
 ];
