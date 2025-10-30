@@ -9,6 +9,9 @@ import JobsPage from "./pages/JobsPage";
 import CandidatesPage from "./pages/CandidatesPage";
 import CandidateDetailPage from "./pages/CandidateDetailPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
+import AssessmentBuilderPage from "./pages/AssessmentBuilderPage";
+import AssessmentTakerPage from "./pages/AssessmentTakerPage";
+import JobDetailPage from "./pages/JobDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -30,9 +33,13 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/candidates" element={<CandidatesPage />} />
             <Route path="/candidates/:id" element={<CandidateDetailPage />} />
             <Route path="/assessments" element={<AssessmentsPage />} />
+            <Route path="/assessments/builder/new" element={<AssessmentBuilderPage />} />
+            <Route path="/assessments/builder/:id" element={<AssessmentBuilderPage />} />
+            <Route path="/assessments/:id" element={<AssessmentTakerPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { assessmentsApi, jobsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, FileText, Clock } from 'lucide-react';
+import { Plus, FileText, Clock, Eye, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function AssessmentsPage() {
+  const navigate = useNavigate();
   const { data: jobsData } = useQuery({
     queryKey: ['jobs', 'active'],
     queryFn: () => jobsApi.getAll({ status: 'active' }),
@@ -22,7 +24,10 @@ export default function AssessmentsPage() {
             Create and manage job-specific assessments
           </p>
         </div>
-        <Button className="gap-2">
+        <Button 
+          className="gap-2"
+          onClick={() => navigate('/assessments/builder/new' + (jobs[0] ? `?jobId=${jobs[0].id}` : ''))}
+        >
           <Plus className="h-4 w-4" />
           Create Assessment
         </Button>
@@ -38,6 +43,7 @@ export default function AssessmentsPage() {
 }
 
 function AssessmentCard({ job }: { job: any }) {
+  const navigate = useNavigate();
   const { data: assessmentsData } = useQuery({
     queryKey: ['assessments', job.id],
     queryFn: () => assessmentsApi.getByJobId(job.id),
@@ -70,12 +76,30 @@ function AssessmentCard({ job }: { job: any }) {
                 Updated {format(new Date(assessment.updatedAt), 'MMM dd, yyyy')}
               </span>
             </div>
-            <Button variant="outline" className="w-full">
-              Edit Assessment
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => navigate(`/assessments/builder/${assessment.id}`)}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+              <Button 
+                className="flex-1"
+                onClick={() => navigate(`/assessments/${assessment.id}`)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Take
+              </Button>
+            </div>
           </>
         ) : (
-          <Button variant="outline" className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => navigate(`/assessments/builder/new?jobId=${job.id}`)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Create Assessment
           </Button>

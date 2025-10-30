@@ -18,6 +18,7 @@ import type { Assessment, AssessmentSection, AssessmentQuestion, QuestionType } 
 import { DndContext, closestCenter, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { InteractiveAssessmentForm } from '@/components/assessments/InteractiveAssessmentForm';
 
 const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
   { value: 'single-choice', label: 'Single Choice' },
@@ -258,10 +259,11 @@ export default function AssessmentBuilderPage() {
         </TabsContent>
 
         <TabsContent value="preview">
-          <AssessmentPreview
+          <InteractiveAssessmentForm
             title={title}
             description={description}
             sections={sections}
+            isPreview={true}
           />
         </TabsContent>
       </Tabs>
@@ -517,110 +519,4 @@ function QuestionEditor({
       </div>
     </div>
   );
-}
-
-function AssessmentPreview({
-  title,
-  description,
-  sections,
-}: {
-  title: string;
-  description: string;
-  sections: AssessmentSection[];
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">{title || 'Untitled Assessment'}</CardTitle>
-        {description && <p className="text-muted-foreground">{description}</p>}
-      </CardHeader>
-      <CardContent className="space-y-8">
-        {sections.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            No sections added yet. Switch to Builder tab to start creating your assessment.
-          </p>
-        ) : (
-          sections.map((section, sIdx) => (
-            <div key={section.id} className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold">{section.title}</h3>
-                {section.description && (
-                  <p className="text-sm text-muted-foreground mt-1">{section.description}</p>
-                )}
-              </div>
-              <Separator />
-              <div className="space-y-6">
-                {section.questions.map((question, qIdx) => (
-                  <div key={question.id} className="space-y-2">
-                    <Label className="text-base">
-                      {qIdx + 1}. {question.text || 'Untitled Question'}
-                      {question.required && <span className="text-destructive ml-1">*</span>}
-                    </Label>
-                    <QuestionPreview question={question} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function QuestionPreview({ question }: { question: AssessmentQuestion }) {
-  switch (question.type) {
-    case 'single-choice':
-      return (
-        <div className="space-y-2">
-          {question.options?.map((option, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input type="radio" name={question.id} disabled />
-              <span className="text-sm">{option}</span>
-            </div>
-          ))}
-        </div>
-      );
-    case 'multi-choice':
-      return (
-        <div className="space-y-2">
-          {question.options?.map((option, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Checkbox disabled />
-              <span className="text-sm">{option}</span>
-            </div>
-          ))}
-        </div>
-      );
-    case 'short-text':
-      return (
-        <Input
-          disabled
-          placeholder="Short answer"
-          maxLength={question.validation?.maxLength}
-        />
-      );
-    case 'long-text':
-      return (
-        <Textarea disabled placeholder="Long answer" rows={4} />
-      );
-    case 'numeric':
-      return (
-        <Input
-          type="number"
-          disabled
-          placeholder="Numeric answer"
-          min={question.validation?.min}
-          max={question.validation?.max}
-        />
-      );
-    case 'file-upload':
-      return (
-        <div className="border-2 border-dashed rounded-lg p-8 text-center">
-          <p className="text-sm text-muted-foreground">File upload (simulated)</p>
-        </div>
-      );
-    default:
-      return null;
-  }
 }
