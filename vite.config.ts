@@ -15,4 +15,20 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Add this 'build' section to fix the production build
+  build: {
+    rollupOptions: {
+      // This tells Vite's bundler to treat these packages as "external"
+      // and not try to bundle them. Since the 'msw/browser' entry
+      // point never actually uses them, this is safe to do.
+      external: [
+        '@inquirer/confirm',
+        'yargs',
+        'yargs-parser',
+        'cli-width',
+        'mute-stream',
+        'signal-exit'
+      ]
+    }
+  }
 }));

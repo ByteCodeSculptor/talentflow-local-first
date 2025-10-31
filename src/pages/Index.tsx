@@ -1,60 +1,68 @@
-import { useQuery } from '@tanstack/react-query';
-import { jobsApi, candidatesApi } from '@/lib/api';
-import { Briefcase, Users, TrendingUp, Clock } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useQuery } from "@tanstack/react-query";
+import { jobsApi, candidatesApi } from "@/lib/api";
+import { Briefcase, Users, TrendingUp, Clock } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   const { data: jobsData } = useQuery({
-    queryKey: ['jobs', 'active'],
-    queryFn: () => jobsApi.getAll({ status: 'active' }),
+    queryKey: ["jobs", "active"],
+    queryFn: () => jobsApi.getAll({ status: "active" }),
   });
 
   const { data: candidatesData } = useQuery({
-    queryKey: ['candidates', 'all'],
+    queryKey: ["candidates", "all"],
     queryFn: () => candidatesApi.search({}),
   });
 
   const activeJobs = jobsData?.data?.length || 0;
   const totalCandidates = candidatesData?.data?.length || 0;
-  const appliedCandidates = candidatesData?.data?.filter((c: any) => c.stage === 'applied').length || 0;
-  const inReview = candidatesData?.data?.filter((c: any) => 
-    ['screen', 'tech'].includes(c.stage)
-  ).length || 0;
+  const appliedCandidates =
+    candidatesData?.data?.filter((c: any) => c.stage === "applied").length || 0;
+  const inReview =
+    candidatesData?.data?.filter((c: any) =>
+      ["screen", "tech"].includes(c.stage)
+    ).length || 0;
 
   const stats = [
     {
-      title: 'Active Jobs',
+      title: "Active Jobs",
       value: activeJobs,
-      description: 'Open positions',
+      description: "Open positions",
       icon: Briefcase,
-      trend: '+12% from last month',
-      href: '/jobs',
+      trend: "+12% from last month",
+      href: "/jobs",
     },
     {
-      title: 'Total Candidates',
+      title: "Total Candidates",
       value: totalCandidates,
-      description: 'In pipeline',
+      description: "In pipeline",
       icon: Users,
       trend: `${appliedCandidates} new applications`,
-      href: '/candidates',
+      href: "/candidates",
     },
     {
-      title: 'In Review',
+      title: "In Review",
       value: inReview,
-      description: 'Active interviews',
+      description: "Active interviews",
       icon: Clock,
-      trend: 'Across all stages',
-      href: '/candidates',
+      trend: "Across all stages",
+      href: "/candidates",
     },
     {
-      title: 'Success Rate',
-      value: '68%',
-      description: 'Offer acceptance',
+      title: "Success Rate",
+      value: "68%",
+      description: "Offer acceptance",
       icon: TrendingUp,
-      trend: '+5% from last quarter',
-      href: '/candidates',
+      trend: "+5% from last quarter",
+      href: "/candidates",
     },
   ];
 
@@ -63,7 +71,7 @@ export default function Index() {
       <div>
         <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Welcome back! Here's an overview of your hiring pipeline.
+          Welcome back! Here's an overview of hiring pipeline.
         </p>
       </div>
 
